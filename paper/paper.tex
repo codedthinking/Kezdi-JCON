@@ -1,543 +1,121 @@
-
-% JuliaCon proceedings template
 \documentclass{juliacon}
+
 \setcounter{page}{1}
 
 \begin{document}
-
 \input{header}
-
 \maketitle
-
 \begin{abstract}
-
-This is a guide for authors who are preparing papers for JuliaCon using the \LaTeX{} document
-preparation system and the \verb|juliacon|  class file.
-
+Economists overwhelmingly rely on proprietary data analysis languages such as Stata and MATLAB for their research computing needs. The transition to open-source languages like Julia presents both syntactic and semantic challenges. We introduce Kezdi.jl, a data analysis package designed for economists that provides a Stata-like interface for working with data frames in Julia. Kezdi.jl aims to ease the transition for economists by offering convenient and familiar data manipulation and analysis functionalities. The package is built on DataFrames.jl and related libraries, but uses a streamlined macro-based interface to eliminate common points of confusion. By emulating best practices from Stata, Kezdi.jl allows economists to be productive in Julia from day one.
 \end{abstract}
 
 \section{Introduction}
 
-The \LaTeX{} document preparation system is a special version of the
-\TeX; typesetting program where-in a collection of \TeX; commands
-are added to \LaTeX{} to simplify typesetting. Importantly, it allows
-the author to concentrate on the logical structure of the document
-rather than its visual layout.\vskip 6pt
-Moreover, \LaTeX{} provides a consistent and comprehensive document
-preparation interface. There are simple-to-use commands for
-generating a table of contents, lists of figures and/or tables, and indexes.
-\LaTeX{} can automatically number list entries, equations, figures,
-tables, and footnotes, as well as articles, sections, and subsections.
-Using this numbering system, bibliographic citations, page
-references, and cross references to any other numbered entity (e.g.
-article, section, equation, figure, list entry, etc.) become quite simple
-and straightforward. The use of \LaTeX{} document classes allows
-a simple change of class to transform the appearance of your document.\vskip 6pt
-\LaTeX{} is a powerful tool for managing long and complex documents.
-In particular, partial processing enables long documents to
-be produced article by article without losing sequential information.
-The use of document classes allows a simple change of style
-(or style option) to transform the appearance of your document.
+Research computing is central to the scientific workflow of economists. Yet the most widely used software tools are decades old proprietary languages \citep{koren2022adoption}. Of the 364 replication packages studied by \citet{koren2023replication}, 72\% used Stata and 41\% used MATLAB, while only 3\% contained any Julia code.
 
+Stata in particular has a dominant position in the data analysis and statistical modeling stages of the research workflow. 88\% of code lines in a typical replication package are devoted to data wrangling and related programming tasks, with only 5\% implementing statistical analysis \citep{koren2023share}. This is no surprise, given that a typical empirical economics paper assembles and harmonizes data from several disparate sources.
 
+The transition from proprietary languages like Stata or MATLAB to open-source ones like Julia presents several challenges. First, the syntax and mental model is very different. Stata is a data-centric language, where commands operate directly on columns of a dataset, and the details of the type system are hidden from the user. Second, Stata and MATLAB have had decades to build a rich library of statistical and econometric routines that are part of the core language. Third, they have developed coding styles and best practices that are ingrained in the muscle memory of economists. To name a concrete example, in Stata one can calculate a heteroskedasticity-robust standard error in a regression by simply adding the option \texttt{robust}. Achieving the same in Julia requires several more keystrokes even if the required packages are loaded.
 
-\section{The JuliaCon Article Class}
-\label{sec:documentclass}
-%
-The juliacon class file preserves the standard LATEX{} interface such
-that any document that can be produced using the standard LATEX{}
-article class can also be produced with the class file.\vskip 6pt
-It is likely that the make up will change after file submission. For
-this reason, we ask you to ignore details such as slightly long lines,
-page stretching, or figures falling out of synchronization, as these
-details can be dealt with at a later stage.\vskip 6pt
-Use should be made of symbolic references (\verb|\ref| ) in order to
-protect against late changes of order, etc.
+Kezdi.jl \footnote{\url{https://github.com/korenmiklos/Kezdi.jl}} is a data analysis package for economists that aims to ease the transition to Julia by providing a Stata-like user experience. It allows users to manipulate data frames and conduct statistical analysis using Stata-inspired macro commands that are both powerful and easy to read.
 
-\section{USING THE JuliaCon Article CLASS FILE}
+\section{Key features of Kezdi.jl}
 
-If the file \verb|juliacon.cls|  is not already in the appropriate system directory
-for \LaTeX{} files, either arrange for it to be put there or copy
-it to your working directory. The \verb|juliacon|  document class is implemented
-as a complete class, not a document style option. In order to
-use the \verb|juliacon  document class, replace \verb|article|  by \verb|juliacon|  in the
-\verb|\documentclass|  command at the beginning of your document:
-\vskip 6pt
-\begin{centering}
-    \verb|\documentclass{article}|  \end{centering}
-\vskip 6pt
-replace by
-\vskip 6pt
- \verb|\documentclass{juliacon}|  \vskip 6pt
-In general, the following standard document \verb|style|  options should
-{ \itshape not} be used with the {\footnotesize \itshape article} class file:
-\begin{enumerate}
-\item[(1)] \verb|10pt|,  \verb|11pt|,  \verb|12pt|   ? unavailable;
-\item[(2)] \verb|twoside|  (no associated style file) ? \verb|twoside|  is the default;
-\item[(3)] \verb|fleqn|, \verb|leqno|, \verb|titlepage| ? should not be used;
-\end{enumerate}
+The overarching design principle of Kezdi.jl is to provide a convenient and familiar interface for economists working with data frames. Here we highlight some key features that help achieve this.
 
-\section{Additional Document Style Options}
-\label{sec:additional_doc}
-%
-The following additional style option is available with the \verb|juliacon|  class file:
-\vskip 6pt
-Please place any additional command definitions at the very start of
-the \LaTeX{} file, before the \verb|\begin{document}|. For example, user-defined
-\verb|\def|  and \verb|\newcommand|   commands that define macros for
-technical expressions should be placed here. Other author-defined
-macros should be kept to a minimum.
-\vskip 6pt
-Commands that differ from the standard \LaTeX{} interface, or that
-are provided in addition to the standard interface, are explained in
-this guide. This guide is not a substitute for the \LaTeX{} manual itself.
-Authors planning to submit their papers in \LaTeX{} are advised to use
-\verb|juliacon.cls|  as early as possible in the creation of their files.
+\subsection{Stata-like command syntax}
 
-%
-%
-%
-%
-\begin{table*}[t]
-\tabcolsep22pt
-\tbl{If necessary, the tables can be extended both columns.}{
-\begin{tabular}{|l|l|c|c|}\hline
-Label & \multicolumn{1}{c|}{Description}
-& Number of Users &
-Number of Queries\\\hline
-Test 1 & Training Data &
-\smash{\raise-7pt\hbox{70}} & 104\\
-\cline{1-2}\cline{4-4}
-Test 2 & Testing Data I & & 105\\\hline
-Test 3 & Testing Data II & 30 & 119\\\hline
-& Total & 100 & 328\\\hline
-\end{tabular}}
-\label{tab:symbols}
-\begin{tabnote}
-This is an example of table footnote.
-\end{tabnote}
-\end{table*}
-% \begin{figure*}[t]
-% \centerline{\includegraphics[width=11cm]{juliagraphs.png}}
-% \caption{If necessary, the images can be extended both columns.}
-%   \label{fig:sample_image}
-% \end{figure*}
-
-\section{Additional features}
-\label{sec:additional_faci}
-In addition to all the standard \LaTeX{} design elements, the \verb|juliacon|  class file includes the following features:
-In general, once you have used the additional \verb|juliacon.cls| facilities
-in your document, do not process it with a standard \LaTeX{} class
-file.
-
-\subsection{Titles, Author's Name, and Affiliation}
-\label{subsub:title_auth}
-The title of the article, author's name, and affiliation are used at the
-beginning of the article (for the main title). These can be produced
-using the following code:
+Commands in Kezdi.jl follow Stata naming conventions and syntax. All commands start with the \texttt{@} sign. Options are separated from arguments by a comma.
 
 \begin{verbatim}
-\title{ This is an example of article title} }
-\author{
-   \large 1st Author \\[-3pt]
-   \normalsize 1st author's affiliation  \\[-3pt]
-    \normalsize 1st line of address \\[-3pt]
-    \normalsize 2nd line of address \\[-3pt]
-    \normalsize	1st author's email address \\[-3pt]
-  \and
-   \large 2nd Author \\[-3pt]
-   \normalsize 2nd author's affiliation  \\[-3pt]
-    \normalsize 1st line of address \\[-3pt]
-    \normalsize 2nd line of address \\[-3pt]
-    \normalsize	2nd author's email address \\[-3pt]
-\and
-   \large 3rd Author \\[-3pt]
-   \normalsize 3rd author's affiliation  \\[-3pt]
-    \normalsize 1st line of address \\[-3pt]
-    \normalsize 2nd line of address \\[-3pt]
-    \normalsize	3rd author's email address \\[-3pt]
-}
-\maketitle
+julia> @use "trade.dta"
+julia> @generate log_trade = log(trade)
+julia> @regress log_trade log_distance, robust
 \end{verbatim}
 
-\subsection{Writing Julia code}
+Kezdi.jl has near complete coverage of Stata's data manipulation commands, including \texttt{egen}, \texttt{collapse}, \texttt{reshape} and \texttt{mvencode}. Combined with Julia's superior performance, this allows economists to easily translate their Stata workflows.
 
-A special environment is already defined for Julia code,
-built on top of \textit{listings} and \textit{jlcode}.
+\subsection{Automatic column selection and vectorization}
+
+Variable names are automatically matched to data frame column names in Kezdi.jl. In standard Julia one would need to wrap these in \texttt{:} or string macros to refer to variables.
+
+Function calls are also automatically vectorized. In the above example, \texttt{log(trade)} is equivalent to \texttt{log.(trade)} in base Julia.
+
+\subsection{Make any function work with data frames}
+
+Because Kezdi.jl supports arbitrary Julia syntax within commands, user-defined functions work seamlessly with data frame columns.
 
 \begin{verbatim}
-\begin{lstlisting}[
-    language = Julia, 
-    numbers=left, 
-    label={lst:exmplg}, 
-    caption={Example Code Block.}
-]
-using Plots
-
-x = -3.0:0.01:3.0
-y = rand(length(x))
-plot(x, y)
-\end{lstlisting}
-\end{verbatim}
-\begin{lstlisting}[
-    language = Julia, 
-    numbers=left, 
-    label={lst:exmplg}, 
-    caption={Example Code Block.}
-]
-using Plots
-
-x = -3.0:0.01:3.0
-y = rand(length(x))
-plot(x, y)
-\end{lstlisting}
-
-
-\subsection{Abstracts, Key words, term etc...}
-\label{subsub:abs_key_etc}
-
-At the beginning of your article, the title should be generated
-in the usual way using the \verb|\maketitle|  command. For genaral tem and keywords use
-\verb|\terms|,
-\verb|\keywords|  commands respectively. The abstract should be enclosed
-within an abstract environment, All these environment
-can be produced using the following code:
-\begin{verbatim}
-\terms{Experimentation, Human Factors}
-
-\keywords{Face animation, image-based modelling...}
-
-\begin{abstract}
-In this paper, we propose a new method for the
-systematic determination of the model's base of
-time varying delay system. This method based on
-the construction of the classification data related
-to the considered system. The number, the orders,
-the time delay and the parameters of the local
-models are generated automatically without any
-knowledge about the full operating range of the
-process. The parametric identification of the local
-models is realized by a new recursive algorithm for
-on line identification of systems with unknown time
-delay. The proposed algorithm allows simultaneous
-estimation of time delay and parameters of
-discrete-time systems. The effectiveness of
-the new method has been illustrated through
-simulation.
-\end{abstract}
-
+julia> mylog(x) = log(x + 1)
+julia> @generate log_trade2 = mylog(trade)
 \end{verbatim}
 
-\section{Some guidelines}
-\label{sec:some_guide}
-The following notes may help you achieve the best effects with the
-\verb|juliacon|  class file.
+This allows economists to easily extend their data manipulation and modeling capabilities beyond Stata's built-in functions. 
 
-\subsection{Sections}
-\label{subsub:sections}
-\LaTeXe{}  provides four levels of section headings and they are all
-defined in the \verb|juliacon|  class file:
+\subsection{Handling of missing values}
+
+Stata has a special \texttt{missing} value and carefully defined rules for their propagation. For example, \texttt{sum(x)} in Stata returns the sum of non-missing values of \texttt{x}.
+
+Missing value handling in Kezdi.jl follows these rules to ensure consistency with Stata. Specifically:
 \begin{itemize}
-\item \verb|\section|
-\item \verb|\subsection|
-\item \verb|\subsubsection|
-\item \verb|\paragraph|
+    \item In logical expressions, \texttt{missing} is treated as \texttt{false}.
+    \item Mathematical operations return \texttt{missing} if any of their arguments are missing.
+    \item Aggregation functions skip missing values by default.
 \end{itemize}
-Section headings are automatically converted to allcaps style.
-\subsection{Lists}
-\label{sec:lists}
-%
-The \verb|juliacon|   class file provides unnumbered lists using the
-\verb|unnumlist|  environment for example,
 
-\begin{unnumlist}
-\item First unnumbered item which has no label and is indented from the
-left margin.
-\item Second unnumbered item.
-\item Third unnumbered item.
-\end{unnumlist}
-The unnumbered list which has no label and is indented from the
-left margin. was produced by:
+\subsection{Syntactic sugar for operating row-wise}
+
+One of the most convenient features of Stata is the ability to restrict any command to a subset of rows. This is specified using logical expressions with the \texttt{if} qualifier.
+
+Kezdi.jl implements the same with the \texttt{@if} macro. Logical expressions are automatically broadcast over rows.
+
 \begin{verbatim}
-\begin{unnumlist}
-\item First unnumbered item...
-\item Second unnumbered item...
-\item Third unnumbered item...
-\end{unnumlist}
+julia> @replace trade = 0 @if ismissing(trade)
+julia> @regress log_trade log_distance @if trade > 0
+julia> @keep @if !ismissing(trade) 
 \end{verbatim}
 
-The \verb|juliacon|  class file also provides hyphen list using the
-\verb|itemize|  environment for example,
+\subsection{Integration with Julia's package ecosystem}
+
+Kezdi.jl builds on the excellent DataFrames.jl ecosystem \citep{DataFrame.jl2023} to provide the data manipulation features. It also integrates tightly with other packages for specific functionality:
+
 \begin{itemize}
-\item First unnumbered bulleted item which has no label and is indented
-from the left margin.
-\item Second unnumbered bulleted item.
-\item Third unnumbered bulleted item which has no label and is indented
-from the left margin.
+    \item FreqTables.jl \citep{FreqTables.jl2023} for frequency tables
+    \item FixedEffectModels.jl \citep{FixedEffectModels.jl2023} for estimating large panel regressions
+    \item Chain.jl for the \texttt{@with} macro
+    \item ReadStatTables.jl for importing Stata \texttt{dta} files
 \end{itemize}
-was produced by:
-\begin{verbatim}
-\begin{itemize}
-\item First item...
-\item Second item...
-\item Third item...
-\end{itemize}
-\end{verbatim}
 
-Numbered list is also provided in acmtog class file using the
-enumerate environment for example,
-\begin{enumerate}
-\item The attenuated and diluted stellar radiation.
-\item Scattered radiation, and
-\item Reradiation from other grains.
-\end{enumerate}
+Crucially, if a package is not directly imported (for example, because it has a long compile time), the user can load it separately and access its functionality directly within Kezdi.jl commands.
 
-was produced by:
-\begin{verbatim}
-\begin{enumerate}
-\item The attenuated...
-\item Scattered radiation, and...
-\item Reradiation from other grains...
-\end{enumerate}
-\end{verbatim}
-\subsection{Illustrations (or figures)}
-\label{subsub:sec_Illus}
-The \verb|juliacon|  class file will cope with most of the positioning of
-your illustrations and you should not normally use the optional positional
-qualifiers on the \verb|figure|  environment that would override
-these decisions.
-\vskip 6pt
+\section{Comparison with related packages}
 
-%
-\begin{figure}[t]
-\centerline{\includegraphics[width=4cm]{juliagraphs.png}}
-\caption{This is example of the image in a column.}
-	\label{fig:sample_figure}
-\end{figure}
+Kezdi.jl is not the first attempt to provide a simplified data analysis workflow in Julia. TimeSeriesRecipes.jl \citep{TimeSeriesRecipes2022} provides a grammar for time series operations. DataFramesMeta.jl \citep{DataFramesMeta2023} and SplitApplyCombine.jl \citep{SplitApplyCombine2023} extend data frame operations. 
 
-The figure \ref{fig:sample_figure} is taken from the JuliaGraphs
-organization \footnote{https://github.com/JuliaGraphs}.
+On the R side, dplyr \citep{dplyr2023} has been a hugely successful abstraction. Tidier.jl \citep{tidier2022} ports many ideas from dplyr to Julia. However, the dplyr model is very different from how economists approach data analysis in Stata.
 
-Figure captions should be \emph{below} the figure itself, therefore the
-\verb|\caption|  command should appear after the figure or space left for
-an illustration. For example, Figure 1 is produced using the following
-commands:
+Kezdi.jl was inspired by Douglass.jl, a work-in-progress package that also aims to provide a Stata-like user experience in Julia \citep{Douglass.jl2023}.
 
-\begin{verbatim}
-\begin{figure}
-\centerline{\includegraphics[width=20pc]{Graphics.eps}}
-\caption{An example of the testing process for a
-binary tree. The globa null hypothesis is tested
-first at level $\alpha$ (a), and the level of
-individual variables is reached last (d). Note
-that individual hypotheses can be tested at
-level $\alpha/4$ and not $\alpha/8$ as one might
-expect at first.}
-\label{sample-figure_2}
-\end{figure}
-\end{verbatim}
-Figures can be resized using first and second argument of
-\verb|\includegraphics|   command. First argument is used for modifying
-figure height and the second argument is used for modifying
-figure width respectively.
-\vskip 6pt
-Cross-referencing of figures, tables, and numbered, displayed
-equations using the \verb|\label|  and \verb|\ref|   commands is encouraged.
-For example, in referencing Figure 1 above, we used
-\verb|Figure~\ref{sample-figure}|
+\section{Conclusion}
 
- \subsection{Tables}
-\label{subsub:sec_Tab}
-The \verb|juliacon|   class file will cope with most of the positioning of
-your tables and you should not normally use the optional positional qualifiers on the table environment which would override these
-decisions. Table captions should be at the top.
-\begin{verbatim}
-\begin{table}
-\tbl{Tuning Set and Testing Set}{
-\begin{tabular}{|l|l|c|c|}\hline
-Label & \multicolumn{1}{c|}{Description}
-& Number of Users &
-Number of Queries\\\hline
-Train70 & Training Data &
-\smash{\raise-7pt\hbox{70}} & 104\\
-\cline{1-2}\cline{4-4}
-Test70 & Testing Data I & & 105\\\hline
-Test30 & Testing Data II & 30 & 119\\\hline
-& Total & 100 & 328\\\hline
-\end{tabular}}
-\end{table}
-\end{verbatim}
+We introduced Kezdi.jl, a data analysis package for economists that provides a Stata-like interface to Julia's data manipulation and statistics ecosystem. Kezdi.jl aims to shorten the learning curve for economists transitioning from Stata, while also unlocking the power and expressiveness of Julia. Our hope is that it will accelerate adoption of Julia in economics and other social sciences.
 
-\begin{table}
-\tbl{Tuning Set and Testing Set}{
-\begin{tabular}{|l|l|c|c|}\hline
-Label & \multicolumn{1}{c|}{Description}
-& Number of Users &
-Number of Queries\\\hline
-Test 1 & Training Data &
-\smash{\raise-7pt\hbox{70}} & 104\\
-\cline{1-2}\cline{4-4}
-Test 2 & Testing Data I & & 105\\\hline
-Test 3 & Testing Data II & 30 & 119\\\hline
-& Total & 100 & 328\\\hline
-\end{tabular}}
-\end{table}
-\subsection{Landscaping Pages}
-\label{subsub:landscaping_pages}
-If a table is too wide to fit the standard measure, it may be turned,
-with its caption, to 90 degrees. Landscape tables cannot be produced
-directly using the \verb|juliacon|   class file because \TeX{} itself cannot
-turn the page, and not all device drivers provide such a facility.
-The following procedure can be used to produce such pages.
-\vskip 6pt
-Use the package \verb|rotating|   in your document and change the coding
-from
-\begin{verbatim}
-\begin{table}...\end{table}
-to
-\begin{sidewaystable}...\end{sidewaystable}
-and for figures
-\begin{figure}...\end{figure}
-to
-\begin{sidewaysfigure}...\end{sidewaysfigure}
-\end{verbatim}
+\backmatter
 
-environments in your document to turn your table on the appropriate
-page of your document. For instance, the following code prints
-a page with the running head, a message half way down and the
-table number towards the bottom.
-\begin{verbatim}
-\begin{sidewaystable}
-\tbl{Landscape table caption to go here.}{...}
-\label{landtab}
-\end{sidewaystable}
-\end{verbatim}
+\bmhead{Acknowledgments}
 
-\subsection{Double Column Figure and Tables}
-\label{subsub:double_fig_tab}
-For generating the output of figures and tables in double column
-we can use the following coding:
+We thank Gábor Kézdi for inspiration and the DataFrames.jl community, especially Bogumił Kamiński, for technical support.
 
-\begin{enumerate}
-\item For Figures:
-\begin{verbatim}
-\begin{figure*}...\end{figure*}
-\end{verbatim}
-\item For landscape figures:
-\begin{verbatim}
-\begin{sidewaysfigure*}...\end{sidewaysfigure*}
-\end{verbatim}
-\item For Tables:
-\begin{verbatim}
-\begin{table*}...\end{table*}
-\end{verbatim}
-\item For landscape tables:
-\begin{verbatim}
-\begin{sidewaystable*}...\end{sidewaystable*}
-\end{verbatim}
-\end{enumerate}
+\section*{References}
+\begingroup
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2pt}
+\def\small{\small}
 
-\subsection{Typesetting Mathematics}
-\label{subsub:type_math}
-The \verb|juliacon| class file will set displayed mathematics with center to
-the column width, provided that you use the \LaTeXe{} standard of
-open and closed square brackets as delimiters.
-The equation
-\[
-\sum_{i=1}^p \lambda_i = (S)
-\]
-
-was typeset using the acmtog class file with the commands
-
-\begin{verbatim}
-\[
-\sum_{i=1}^p \lambda_i = (S)
-\]
-\end{verbatim}
-
-For display equations, cross-referencing is encouraged. For example,
-\begin{verbatim}
-\begin{equation}
-(n-1)^{-1} \sum^n_{i=1} (X_i - \overline{X})^2.
-\label{eq:samplevar}
-\end{equation}
-Equation~(\ref{eq:samplevar}) gives the formula for
-sample variance.
-\end{verbatim}
-The following output is generated with the above coding:
-\begin{equation}
-(n-1)^{-1} \sum^n_{i=1} (X_i - \overline{X})^2.
-\label{eq:samplevar}
-\end{equation}
-Equation~(\ref{eq:samplevar}) gives the formula for
-sample variance.
-
-
-\subsection{Enunciations}
-\label{subsub:enunciation}
-The \verb|juliacon|   class file generates the enunciations with the help of
-the following commands:
-\begin{verbatim}
-\begin{theorem}...\end{theorem}
-\begin{strategy}...\end{strategy}
-\begin{property}...\end{property}
-\begin{proposition}...\end{proposition}
-\begin{lemma}...\end{lemma}
-\begin{example}...\end{example}
-\begin{proof}...\end{proof}
-\begin{definition}...\end{definition}
-\begin{algorithm}...\end{algorithm}
-\begin{remark}...\end{remark}
-\end{verbatim}
-The above-mentioned coding can also include optional arguments
-such as
-\begin{verbatim}
-\begin{theorem}[...]. Example for theorem:
-\begin{theorem}[Generalized Poincare Conjecture]
-Four score and seven ... created equal.
-\end{theorem}
-\end{verbatim}
-
-\begin{theorem}[Generalized Poincare Conjecture]
-Four score and seven years ago our fathers brought forth,
-upon this continent, a new nation, conceived in Liberty,
- and dedicated to the proposition that all men are
-created equal.
-\end{theorem}
-
-
-\subsection{Extract}
-\label{subsub:extract}
-Extract environment should be coded within
-\begin{verbatim}
-\begin{extract}..\end{extract}
-\end{verbatim}
-
-\subsection{Balancing column at last page}
-\label{subsub:Balance}
-For balancing the both column length at last page use :
-\begin{verbatim}
-\vadjust{\vfill\pagebreak}
-\end{verbatim}
-
-%\vadjust{\vfill\pagebreak}
-
-at appropriate place in your \TeX{} file or in bibliography file.
-
-\section{Handling references}
-\label{subsub:references}
-References are most easily (and correctly) generated using the
-BIBTEX, which is easily invoked via
-\begin{verbatim}
-\bibliographystyle{juliacon}
 \bibliography{ref}
-\end{verbatim}
-When submitting the document source (.tex) file to external
-parties, the ref.bib file should be sent with it.
-\cite{bezanson2017julia}
+\bibliographystyle{juliacon}
 
-\input{bib.tex}
+\endgroup
 
 \end{document}
 
-% Inspired by the International Journal of Computer Applications template
